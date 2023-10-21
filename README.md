@@ -1,2 +1,2 @@
 # gather
-Crawl, scrape, organize anime and cartoons from the internet.
+Crawl, scrape, and organize anime/cartoons/manga/media from the internet.
