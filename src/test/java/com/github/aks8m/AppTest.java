@@ -1,5 +1,9 @@
 package com.github.aks8m;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.LauncherSession;
@@ -9,8 +13,15 @@ import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
@@ -19,17 +30,43 @@ public class AppTest {
 
     private static final Logger LOG = Logger.getLogger(AppTest.class.getSimpleName());
 
+    private HttpServer server;
+
     public static void main(String[] args){
         AppTest appTest = new AppTest();
+        appTest.startTestDependencies();
         TestExecutionSummary summary = appTest.discoverAndRunTests();
         appTest.logTestResults(summary);
+//        appTest.stopTestDependencies();
     }
 
     public void startTestDependencies(){
-
+        final InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
+        server = SimpleFileServer.createFileServer(address, initializeHTML(), SimpleFileServer.OutputLevel.VERBOSE);
+        server.start();
     }
 
-    public void stopTestDependencies(){}
+    private Path initializeHTML(){
+        Path root;
+        try {
+            FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix());
+            root = fileSystem.getPath("/");
+            Files.createDirectories(root.resolve("test/test2"));
+            Path foo = fileSystem.getPath("/foo");
+            Files.createDirectory(foo);
+
+            Path hello = foo.resolve("hello.txt");
+            Files.write(hello, List.of("hello", "world"), StandardCharsets.UTF_8);
+
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return root;
+    }
+
+    public void stopTestDependencies(){
+        server.stop(0);
+    }
 
     public TestExecutionSummary discoverAndRunTests(){
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
