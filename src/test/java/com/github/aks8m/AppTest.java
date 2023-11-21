@@ -4,7 +4,6 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.LauncherSession;
@@ -20,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -41,6 +39,9 @@ public class AppTest {
         appTest.afterTests();
     }
 
+    /**
+     * Configure and run the in-memory HTTP server with test website
+     */
     void beforeTests(){
         InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
 
@@ -57,10 +58,18 @@ public class AppTest {
         httpServer.start();
     }
 
+    /**
+     * Stop the in-memory HTTP server with test website
+     */
     void afterTests(){
         httpServer.stop(0);
     }
 
+    /**
+     * Discover, Execute, and report all JUnit5 annotated tests with the following packages:
+     *    1) com.github.aks8m.test - for unit tests
+     *    2) com.github.aks8m.it - for integration tests
+     */
     void runTests(){
         //Configure Test Discovery and Execute Tests
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
@@ -83,7 +92,7 @@ public class AppTest {
         junitSummary.append("Passed: " + summary.getTestsSucceededCount() + "\n");
         junitSummary.append("Failed: " + summary.getTestsFailedCount() + "\n");
         summary.getFailures().stream()
-                .map(failure ->  failure.getTestIdentifier().getSource().get().toString())
+                .map(failure -> failure.getTestIdentifier().getDisplayName() + ": " + failure.getException().getMessage())
                 .forEach(failureString -> junitSummary.append("\t" + failureString + "\n"));
         junitSummary.append("Aborted: " + summary.getTestsAbortedCount() + "\n");
         junitSummary.append("Skipped: " + summary.getTestsSkippedCount() + "\n");
@@ -93,9 +102,11 @@ public class AppTest {
     }
 
     /**
+     * Create the following HTML pages (as strings) using JIMFS library
+     *
      *                 I
      *             A       B
-     *    B <- C -   - D -   - E -> I
+     *    B <- C -   - D -   - E
      * @return - Index or Root Path object
      */
     private void createHTMLSite(Path html) throws IOException {
@@ -111,9 +122,9 @@ public class AppTest {
                 "<body>\n",
                 "Page: Index\n",
                 "<br>\n",
-                "<a href=\"a.html\">A</a>\n",
+                "<a href=\"http://localhost:8080/a.html\">A</a>\n",
                 "<br>\n",
-                "<a href=\"b.html\">B</a>\n",
+                "<a href=\"http://localhost:8080/b.html\">B</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -129,9 +140,9 @@ public class AppTest {
                 "<body>\n",
                 "Page: A\n",
                 "<br>\n",
-                "<a href=\"c.html\">C</a>\n",
+                "<a href=\"http://localhost:8080/c.html\">C</a>\n",
                 "<br>\n",
-                "<a href=\"d.html\">D</a>\n",
+                "<a href=\"http://localhost:8080/d.html\">D</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -147,9 +158,9 @@ public class AppTest {
                 "<body>\n",
                 "Page: B\n",
                 "<br>\n",
-                "<a href=\"d.html\">D</a>\n",
+                "<a href=\"http://localhost:8080/d.html\">D</a>\n",
                 "<br>\n",
-                "<a href=\"e.html\">E</a>\n",
+                "<a href=\"http://localhost:8080/e.html\">E</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -165,7 +176,7 @@ public class AppTest {
                 "<body>\n",
                 "Page: C\n",
                 "<br>\n",
-                "<a href=\"b.html\">B</a>\n",
+                "<a href=\"http://localhost:8080/b.html\">B</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -195,7 +206,6 @@ public class AppTest {
                 "<body>\n",
                 "Page: E\n",
                 "<br>\n",
-                "<a href=\"index.html\">Index</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
     }

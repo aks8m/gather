@@ -18,6 +18,12 @@ public class GatherBuild extends BaseProject {
         downloadSources = true;
         repositories = List.of(MAVEN_CENTRAL);
 
+        scope(Scope.compile)
+                .include(dependency(
+                        "org.jsoup",
+                        "jsoup",
+                        version(1, 16, 2)));
+
         scope(Scope.test)
                 .include(dependency(
                         "org.junit.jupiter",
@@ -33,9 +39,6 @@ public class GatherBuild extends BaseProject {
                         version(1, 3, 0)));
 
         testOperation().mainClass("com.github.aks8m.AppTest");
-
-        testClasspath().add("GatherTest");
-
     }
 
     public static void main(String[] args) {
