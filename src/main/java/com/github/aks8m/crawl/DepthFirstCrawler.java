@@ -35,12 +35,12 @@ public class DepthFirstCrawler implements Crawler {
         pageStage.push(rootURL);
         while (!pageStage.isEmpty()){
             //Visit page
-            Document page = Jsoup.connect(pageStage.pop()).get();
+            Document page = Jsoup.connect(pageStage.pop()).userAgent("chrome").get();
             history.add(page.location());
             LOG.info("Visited " + page.location());
             //Look at all links on page and queue to visit (if not queued or visited prior)
             for(Element link : page.select("a[href]")){
-                String linkURL = link.attr("href");
+                String linkURL = link.attr("abs:href");
                 if (!history.contains(linkURL) && !pageStage.contains(linkURL)){
                     pageStage.push(linkURL);
                     LOG.info("Identified " + linkURL);

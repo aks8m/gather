@@ -35,7 +35,7 @@ public class BreadthFirstCrawler implements Crawler{
         pageQueue.add(rootURL);
         while(!pageQueue.isEmpty()){
             //Visit page
-            Document page = Jsoup.connect(pageQueue.poll()).get();
+            Document page = Jsoup.connect(pageQueue.poll()).userAgent("chrome").get();
             history.add(page.location());
             LOG.info("Visited " + page.location());
 
@@ -43,7 +43,7 @@ public class BreadthFirstCrawler implements Crawler{
 
             //Look at all links on page and queue to visit (if not queued or visited prior)
             for(Element link : page.select("a[href]")){
-                String linkURL = link.attr("href");
+                String linkURL = link.attr("abs:href");
                 if (!history.contains(linkURL) && !pageQueue.contains(linkURL)){
                     pageQueue.add(linkURL);
                     LOG.info("Identified " + linkURL);
