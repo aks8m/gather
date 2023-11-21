@@ -3,6 +3,8 @@ package com.github.aks8m.crawl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.Stack;
  */
 
 public class DepthFirstCrawler implements Crawler {
+
+    private final static Logger LOG = LoggerFactory.getLogger(DepthFirstCrawler.class.getSimpleName());
 
     private final List<String> history;
     private final String rootURL;
@@ -33,11 +37,13 @@ public class DepthFirstCrawler implements Crawler {
             //Visit page
             Document page = Jsoup.connect(pageStage.pop()).get();
             history.add(page.location());
+            LOG.info("Visited " + page.location());
             //Look at all links on page and queue to visit (if not queued or visited prior)
             for(Element link : page.select("a[href]")){
                 String linkURL = link.attr("href");
                 if (!history.contains(linkURL) && !pageStage.contains(linkURL)){
                     pageStage.push(linkURL);
+                    LOG.info("Identified " + linkURL);
                 }
             }
         }

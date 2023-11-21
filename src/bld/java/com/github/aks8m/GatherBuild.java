@@ -22,7 +22,19 @@ public class GatherBuild extends BaseProject {
                 .include(dependency(
                         "org.jsoup",
                         "jsoup",
-                        version(1, 16, 2)));
+                        version(1, 16, 2)))
+                .include(dependency(
+                        "org.slf4j",
+                        "slf4j-api",
+                        version(2, 0, 9)))
+                .include(dependency(
+                        "org.slf4j",
+                        "slf4j-reload4j",
+                        version(2,0,9)))
+                .include(dependency(
+                        "ch.qos.reload4j",
+                        "reload4j",
+                        version(1, 2, 25)));
 
         scope(Scope.test)
                 .include(dependency(
@@ -36,7 +48,19 @@ public class GatherBuild extends BaseProject {
                 .include(dependency(
                         "com.google.jimfs",
                         "jimfs",
-                        version(1, 3, 0)));
+                        version(1, 3, 0)))
+                .include(dependency(
+                        "org.slf4j",
+                        "slf4j-api",
+                        version(2, 0, 9)))
+                .include(dependency(
+                        "org.slf4j",
+                        "slf4j-reload4j",
+                        version(2,0,9)))
+                .include(dependency(
+                        "ch.qos.reload4j",
+                        "reload4j",
+                        version(1, 2, 25)));
 
         testOperation().mainClass("com.github.aks8m.AppTest");
     }

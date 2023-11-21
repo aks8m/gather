@@ -4,6 +4,7 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
+import org.apache.log4j.BasicConfigurator;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.LauncherSession;
@@ -12,6 +13,8 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,18 +25,17 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
 
 public class AppTest {
 
-    private static final Logger LOG = Logger.getLogger(AppTest.class.getSimpleName());
+    private static final Logger LOG = LoggerFactory.getLogger(AppTest.class.getSimpleName());
     private HttpServer httpServer;
 
     public static void main(String[] args){
+        // Set up a simple configuration that logs on the console.
         AppTest appTest = new AppTest();
-
         appTest.beforeTests();
         appTest.runTests();
         appTest.afterTests();
@@ -87,18 +89,15 @@ public class AppTest {
 
         //Summarize JUnit5 Test Execution
         TestExecutionSummary summary = listener.getSummary();
-        StringBuilder junitSummary = new StringBuilder();
-        junitSummary.append(summary.getTestsStartedCount() + " of " + summary.getTestsFoundCount() + " Test Ran\n");
-        junitSummary.append("Passed: " + summary.getTestsSucceededCount() + "\n");
-        junitSummary.append("Failed: " + summary.getTestsFailedCount() + "\n");
+        LOG.info(summary.getTestsStartedCount() + " of " + summary.getTestsFoundCount() + " Test Ran");
+        LOG.info("Passed: " + summary.getTestsSucceededCount());
+        LOG.info("Failed: " + summary.getTestsFailedCount());
         summary.getFailures().stream()
                 .map(failure -> failure.getTestIdentifier().getDisplayName() + ": " + failure.getException().getMessage())
-                .forEach(failureString -> junitSummary.append("\t" + failureString + "\n"));
-        junitSummary.append("Aborted: " + summary.getTestsAbortedCount() + "\n");
-        junitSummary.append("Skipped: " + summary.getTestsSkippedCount() + "\n");
-        junitSummary.append("Total Time: " +
-                Duration.between(Instant.ofEpochMilli(summary.getTimeStarted()), Instant.ofEpochMilli(summary.getTimeFinished())));
-        LOG.info(junitSummary.toString());
+                .forEach(LOG::info);
+        LOG.info("Aborted: " + summary.getTestsAbortedCount());
+        LOG.info("Skipped: " + summary.getTestsSkippedCount());
+        LOG.info("Total Time: " + Duration.between(Instant.ofEpochMilli(summary.getTimeStarted()), Instant.ofEpochMilli(summary.getTimeFinished())));
     }
 
     /**
