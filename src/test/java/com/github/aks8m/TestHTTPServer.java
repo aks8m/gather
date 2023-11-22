@@ -4,15 +4,6 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
-import org.apache.log4j.BasicConfigurator;
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.LauncherSession;
-import org.junit.platform.launcher.TestPlan;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,29 +13,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
+public class TestHTTPServer {
 
-public class AppTest {
+    private static final Logger LOG = LoggerFactory.getLogger(TestHTTPServer.class.getSimpleName());
 
-    private static final Logger LOG = LoggerFactory.getLogger(AppTest.class.getSimpleName());
     private HttpServer httpServer;
+    private final String url = "http://localhost:8080";
 
-    public static void main(String[] args){
-        // Set up a simple configuration that logs on the console.
-        AppTest appTest = new AppTest();
-        appTest.beforeTests();
-        appTest.runTests();
-        appTest.afterTests();
+    public String url(){
+        return url;
     }
 
-    /**
-     * Configure and run the in-memory HTTP server with test website
-     */
-    void beforeTests(){
+    public void start(){
         InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
 
         try (FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix())) {
@@ -60,44 +42,8 @@ public class AppTest {
         httpServer.start();
     }
 
-    /**
-     * Stop the in-memory HTTP server with test website
-     */
-    void afterTests(){
+    public void stop(){
         httpServer.stop(0);
-    }
-
-    /**
-     * Discover, Execute, and report all JUnit5 annotated tests with the following packages:
-     *    1) com.github.aks8m.test - for unit tests
-     *    2) com.github.aks8m.it - for integration tests
-     */
-    void runTests(){
-        //Configure Test Discovery and Execute Tests
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(
-                        selectPackage("com.github.aks8m.test"),
-                        selectPackage("com.github.aks8m.it"))
-                .build();
-        SummaryGeneratingListener listener = new SummaryGeneratingListener();
-        try (LauncherSession session = LauncherFactory.openSession()) {
-            Launcher launcher = session.getLauncher();
-            launcher.registerTestExecutionListeners(listener);
-            TestPlan testPlan = launcher.discover(request);
-            launcher.execute(testPlan);
-        }
-
-        //Summarize JUnit5 Test Execution
-        TestExecutionSummary summary = listener.getSummary();
-        LOG.info(summary.getTestsStartedCount() + " of " + summary.getTestsFoundCount() + " Test Ran");
-        LOG.info("Passed: " + summary.getTestsSucceededCount());
-        LOG.info("Failed: " + summary.getTestsFailedCount());
-        summary.getFailures().stream()
-                .map(failure -> failure.getTestIdentifier().getDisplayName() + ": " + failure.getException().getMessage())
-                .forEach(LOG::info);
-        LOG.info("Aborted: " + summary.getTestsAbortedCount());
-        LOG.info("Skipped: " + summary.getTestsSkippedCount());
-        LOG.info("Total Time: " + Duration.between(Instant.ofEpochMilli(summary.getTimeStarted()), Instant.ofEpochMilli(summary.getTimeFinished())));
     }
 
     /**
@@ -208,8 +154,5 @@ public class AppTest {
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
     }
+
 }
-
-
-
-

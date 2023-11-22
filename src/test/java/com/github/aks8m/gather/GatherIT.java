@@ -1,7 +1,6 @@
-package com.github.aks8m.it;
+package com.github.aks8m.gather;
 
 import com.github.aks8m.crawl.CrawlerType;
-import com.github.aks8m.gather.Gather;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -26,5 +25,4 @@ public class GatherIT {
 
         assertTrue(!results.isEmpty());
     }
-
 }
