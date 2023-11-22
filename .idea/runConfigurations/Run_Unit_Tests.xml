@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Unit Tests" type="JUnit" factoryName="JUnit">
-    <module name="app" />
+    <module name="gather" />
     <option name="PACKAGE_NAME" value="moog" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
