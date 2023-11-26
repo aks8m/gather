@@ -10,7 +10,7 @@ import static rife.bld.dependencies.Scope.*;
 public class GatherBuild extends Project {
     public GatherBuild() {
         pkg = "com.github.aks8m";
-        name = "Gather";
+        name = "gather";
         mainClass = "com.github.aks8m.GatherMain";
         version = version(0,1,0);
 

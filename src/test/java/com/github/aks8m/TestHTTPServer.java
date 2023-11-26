@@ -22,16 +22,23 @@ public class TestHTTPServer {
     private HttpServer httpServer;
     private final String url = "http://localhost:8080";
 
+    /**
+     * URL the HTTP server is configured to use
+     * @return String URL
+     */
     public String url(){
         return url;
     }
 
+    /**
+     * Start the HTTP Server
+     */
     public void start(){
         InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix())) {
-            FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
-            Path html = fs.getPath("/html");
+        try {
+            FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix());
+            Path html = fileSystem.getPath("/html");
             Files.createDirectory(html);
             createHTMLSite(html);
             httpServer = SimpleFileServer.createFileServer(address, html, SimpleFileServer.OutputLevel.NONE);
@@ -49,10 +56,12 @@ public class TestHTTPServer {
     /**
      * Create the following HTML pages (as strings) using JIMFS library
      *
-     *                 I
+     *                  I
      *             A       B
-     *    B <- C -   - D -   - E
-     * @return - Index or Root Path object
+     *         C -   - D -   - E
+     *    B <-                   >> https://blank.page
+     *
+     * @return Index or Root Path object
      */
     private void createHTMLSite(Path html) throws IOException {
         Path indexHTML = html.resolve("index.html");
@@ -151,6 +160,7 @@ public class TestHTTPServer {
                 "<body>\n",
                 "Page: E\n",
                 "<br>\n",
+                "<a href=\"https://blank.page\">Google</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
     }
