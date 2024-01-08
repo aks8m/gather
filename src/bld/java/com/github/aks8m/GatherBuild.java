@@ -11,7 +11,7 @@ public class GatherBuild extends Project {
     public GatherBuild() {
         pkg = "com.github.aks8m";
         name = "gather";
-        mainClass = "com.github.aks8m.GatherMain";
+        mainClass = "com.github.aks8m.GatherApp";
         version = version(0,1,0);
 
         downloadSources = true;

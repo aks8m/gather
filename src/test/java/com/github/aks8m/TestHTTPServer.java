@@ -22,6 +22,11 @@ public class TestHTTPServer {
     private HttpServer httpServer;
     private final String url = "http://localhost:8080";
 
+    public static void main(String[] args){
+        TestHTTPServer testHTTPServer = new TestHTTPServer();
+        testHTTPServer.start();
+    }
+
     /**
      * URL the HTTP server is configured to use
      * @return String URL
@@ -57,10 +62,12 @@ public class TestHTTPServer {
      * Create the following HTML pages (as strings) using JIMFS library
      *
      *                  I
-     *             A       B
-     *         C -   - D -   - E
-     *    B <-                   >> https://blank.page
-     *
+     *              A -   - B
+     *          C -   - D -   - E
+     *      F -   - G     - H -    - I
+     *        <- B            -> *    - J
+     *                                    - K
+     *  *https://blank.page
      * @return Index or Root Path object
      */
     private void createHTMLSite(Path html) throws IOException {
@@ -130,7 +137,9 @@ public class TestHTTPServer {
                 "<body>\n",
                 "Page: C\n",
                 "<br>\n",
-                "<a href=\"http://localhost:8080/b.html\">B</a>\n",
+                "<a href=\"http://localhost:8080/f.html\">F</a>\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/g.html\">G</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -145,6 +154,8 @@ public class TestHTTPServer {
                 "</head>\n",
                 "<body>\n",
                 "Page: D\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/h.html\">H</a>\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
 
@@ -160,7 +171,101 @@ public class TestHTTPServer {
                 "<body>\n",
                 "Page: E\n",
                 "<br>\n",
-                "<a href=\"https://blank.page\">Google</a>\n",
+                "<a href=\"http://localhost:8080/h.html\">H</a>\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/i.html\">I</a>\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path fHTML = html.resolve("f.html");
+        Files.createFile(fHTML);
+        Files.write(fHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>F</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: F\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/b.html\">B</a>\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path gHTML = html.resolve("g.html");
+        Files.createFile(gHTML);
+        Files.write(gHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>G</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: G\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path hHTML = html.resolve("h.html");
+        Files.createFile(hHTML);
+        Files.write(hHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>H</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: H\n",
+                "<br>\n",
+                "<a href=\"https://blank.page\">Blank Page</a>\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path iHTML = html.resolve("i.html");
+        Files.createFile(iHTML);
+        Files.write(iHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>I</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: I\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/j.html\">J</a>\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path jHTML = html.resolve("j.html");
+        Files.createFile(jHTML);
+        Files.write(jHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>J</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: J\n",
+                "<br>\n",
+                "<a href=\"http://localhost:8080/k.html\">K</a>\n",
+                "</body>\n",
+                "</html>"), StandardCharsets.UTF_8);
+
+        Path kHTML = html.resolve("k.html");
+        Files.createFile(kHTML);
+        Files.write(kHTML, List.of(
+                "<!DOCTYPE html>\n",
+                "<html lang=\"en\">\n",
+                "<head>\n",
+                "    <meta charset=\"UTF-8\">\n",
+                "    <title>K</title>\n",
+                "</head>\n",
+                "<body>\n",
+                "Page: K\n",
                 "</body>\n",
                 "</html>"), StandardCharsets.UTF_8);
     }
